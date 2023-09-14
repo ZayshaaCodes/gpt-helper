@@ -25,13 +25,19 @@ namespace GPT.API.AiFunctions
 
         public override string Invoke(Dictionary<string, string> args)
         {
-            if (args.TryGetValue("filesList", out string filesList))
+            if (args.TryGetValue("filesList", out string pathList))
             {
-                var files = JsonConvert.DeserializeObject<Dictionary<string, string>>(filesList);
-                foreach (var file in files)
+                var paths = JsonConvert.DeserializeObject<Dictionary<string, string>>(pathList);
+                foreach (var item in paths)
                 {
-                    File.Move(file.Key, file.Value);
-                    //Console.WriteLine($"pretend renamed {file.Key} to {file.Value}");
+                    if (File.Exists(item.Key))
+                    {
+                        File.Move(item.Key, item.Value);
+                    }
+                    else if (Directory.Exists(item.Key))
+                    {
+                        Directory.Move(item.Key, item.Value);
+                    }
                 }
             }
             return "done";

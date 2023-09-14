@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace GPT.API.AiFunctions
 {
     [AutoLink]
@@ -38,50 +40,59 @@ namespace GPT.API.AiFunctions
         }
     }
 
-    //[AutoLink] // this one will create a file, path is relative to the project folder, content is the content of the file
-    // public class CreateFile : GptFunction
-    // {
-    //     public CreateFile()
-    //     {
-    //         name        = GetType().Name;
-    //         description = "Creates a file, if the file already exists it will be overwritten";
-    //         var paramProps = new Dictionary<string, ParameterProperties>
-    //         {
-    //             {
-    //                 "path",
-    //                 new()
-    //                 {
-    //                     type = "string",
-    //                     description = "The path to the file to create"
-    //                 }
-    //             },
-    //             {
-    //                 "content",
-    //                 new()
-    //                 {
-    //                     type = "string",
-    //                     description = "The content of the file to create"
-    //                 }
-    //             }
-    //         };
+    [AutoLink]
+    public class PythonExec : GptAction
+    {
+        public PythonExec()
+        {
+            name        = GetType().Name;
+            description = "Executes python code given a path";
+            requiresApproval = true;
+            var paramProps = new Dictionary<string, ParameterProperties>
+            {
+                {
+                    "path",
+                    new ParameterProperties()
+                    {
+                        type = "string",
+                        description = "path of the python file to execute"
+                    }
+                }
+            };
+            parameters = new()
+            {
+                type = "object",
+                properties = paramProps,
+                required = new[] { "path" }
+            };
+        }
 
-    //         parameters = new ParameterInfo()
-    //         {
-    //             type = "object",
-    //             properties = paramProps, 
-    //             required = new[] { "path", "content" }
-    //         };
-    //     }
+        public override string Invoke(Dictionary<string, string> args)
+        {
+            if (args.TryGetValue("path", out string path))
+            {
+                var psi = new ProcessStartInfo
+                {
+                    FileName = "python3",
+                    Arguments = path,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+                var process = Process.Start(psi);
+                process.WaitForExit();
+                var output = process.StandardOutput.ReadToEnd();
+                var error = process.StandardError.ReadToEnd();
+                if (error != "")
+                    // Debug.LogError(error);
+                    Console.WriteLine(error);
+                else
+                    // Debug.Log(output);
+                    Console.WriteLine(output);
+                    return output;
+            }
 
-    //     public override string Invoke(Dictionary<string, string> args)
-    //     {
-    //         if (args.TryGetValue("path", out string path) && args.TryGetValue("content", out string content))
-    //         {
-    //             System.IO.File.WriteAllText(path, content);
-    //         }
-
-    //         return "";
-    //     }
-    // }
-
+            return "";
+        }
+    }
 }

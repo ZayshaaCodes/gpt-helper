@@ -32,11 +32,18 @@ namespace GPT.API.AiFunctions
                 path = argPath;
 
             string[] files = Directory.GetFiles(path);
+            string[] dirs = Directory.GetDirectories(path);
 
             foreach (var file in files)
             {
                 s += file + "\n";
             }
+
+            foreach (var dir in dirs)
+            {
+                s += dir + "\n";
+            }
+
             //remove the last newline
             s = s.Substring(0, s.Length - 1);
 

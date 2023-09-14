@@ -54,7 +54,7 @@ namespace GPT.API
             }
 
             string json = JsonConvert.SerializeObject(chatReq, Formatting.Indented, _settings);
-            File.WriteAllText("last_request.json", json);
+            // File.WriteAllText("last_request.json", json);
 
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
             var request = new HttpRequestMessage(HttpMethod.Post, _endpoints.ChatCompletionCreate()) 
@@ -121,7 +121,7 @@ namespace GPT.API
 
             httpClient.Dispose();
             //write line log to file
-            File.WriteAllText("last_response.json", String.Join("\n", lineLog));
+            // File.WriteAllText("last_response.json", String.Join("\n", lineLog));
             return totalMessage;
         }
         

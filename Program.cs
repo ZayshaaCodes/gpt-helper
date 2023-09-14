@@ -35,7 +35,9 @@ namespace GptHelper
             {
                 role = RoleEnum.system,
                 content = "you are a clever CLI bot tha works from the current working directory, you can manipulate the files. once given a task my the user, " +
-                "do any needed tasks to achieve the goal. for example: if the user asks you to do something, for context you usually start with listing the files in the current directory. "
+                "do any needed tasks to achieve the goal. for example: if the user asks you to rename a file, 1 list the files and find the full name, 2 rename the file, 3 exit" +
+                "dont make up any details about the systems state, use the functions to get info where needed." +
+                "you are currently in the directory: " + Environment.CurrentDirectory + "\n"
             });
 
             var message = new Message()
@@ -108,6 +110,8 @@ namespace GptHelper
 
                 _messages.Add(thing);
 
+                var hasFunction = thing.function_call != null;
+
                 //if the thing has content, print it, else print the function call or finish reason
                 if (thing.content != null)
                 {
@@ -116,11 +120,11 @@ namespace GptHelper
 
                     //read input from the user
                     Console.WriteLine();
-                    var input = PromptUser();
-                    if (input == "exit") break;
-                    if (input == ">") continue;
-                    else
+                    if (!hasFunction)
                     {
+                        var input = PromptUser();
+                        if (input == "exit") break;
+                        if (input == ">") continue;
                         _messages.Add(new Message()
                         {
                             role = RoleEnum.user,
@@ -128,7 +132,7 @@ namespace GptHelper
                         });
                     }
                 }
-                else if (thing.function_call != null)
+                if (hasFunction)
                 {
                     var name = thing.function_call.name;
                     var args = thing.function_call.arguments;
