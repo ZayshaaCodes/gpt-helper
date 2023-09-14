@@ -5,7 +5,7 @@ namespace GPT.API.AiFunctions
     {
         public ReadFile()
         {
-            name        = GetType().Name;
+            name = GetType().Name;
             description = "Reads a file";
             requiresApproval = false;
             var paramProps = new Dictionary<string, ParameterProperties>
@@ -23,21 +23,28 @@ namespace GPT.API.AiFunctions
             parameters = new ParameterInfo()
             {
                 type = "object",
-                properties = paramProps, 
+                properties = paramProps,
                 required = new[] { "path" }
             };
         }
 
         public override string Invoke(Dictionary<string, string> args)
         {
-            if (args.TryGetValue("path", out string path))
+            string res = null;
+            try
             {
-                return System.IO.File.ReadAllText(path);
+                if (args.TryGetValue("path", out string path))
+                {
+                    return File.ReadAllText(path);
+                }
             }
-
-            return "";
+            catch (System.Exception e)
+            {
+                res = e.Message.ToString();
+            }
+            return res;
         }
     }
 
-    
+
 }

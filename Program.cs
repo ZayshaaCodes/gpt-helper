@@ -161,6 +161,8 @@ namespace GptHelper
                     var argDict = jArgs?.ToObject<Dictionary<string, string>>();
 
                     var result = func.Invoke(argDict);
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.WriteLine(result);
 
                     if (result == "[DONE]")
                     {

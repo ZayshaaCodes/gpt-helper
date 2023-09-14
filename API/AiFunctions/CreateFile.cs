@@ -1,6 +1,6 @@
 namespace GPT.API.AiFunctions
 {
-    [AutoLink] // this one will create a file, path is relative to the project folder, content is the content of the file
+    [AutoLink] // this one will create a file, path is relative to the working dir, content is the content of the file. not to be used for writing more than 100 lines
     public class CreateFile : GptFunction
     {
         public CreateFile()
@@ -39,7 +39,7 @@ namespace GPT.API.AiFunctions
         {
             if (args.TryGetValue("path", out string path) && args.TryGetValue("content", out string content))
             {
-                System.IO.File.WriteAllText(path, content);
+                File.WriteAllText(path, content);
             }
 
             return "";

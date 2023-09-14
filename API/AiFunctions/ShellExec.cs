@@ -3,21 +3,21 @@ using System.Diagnostics;
 namespace GPT.API.AiFunctions
 {
     [AutoLink]
-    public class PythonExec : GptAction
+    public class ShellExec : GptAction
     {
-        public PythonExec()
+        public ShellExec()
         {
             name = GetType().Name;
-            description = "Executes python code given a path";
+            description = "Executes a shell command";
             requiresApproval = true;
             var paramProps = new Dictionary<string, ParameterProperties>
             {
                 {
-                    "path",
+                    "command",
                     new ParameterProperties()
                     {
                         type = "string",
-                        description = "path of the python file to execute"
+                        description = "command to execute"
                     }
                 }
             };
@@ -25,18 +25,18 @@ namespace GPT.API.AiFunctions
             {
                 type = "object",
                 properties = paramProps,
-                required = new[] { "path" }
+                required = new[] { "command" }
             };
         }
 
         public override string Invoke(Dictionary<string, string> args)
         {
-            if (args.TryGetValue("path", out string path))
+            if (args.TryGetValue("command", out string command))
             {
                 var psi = new ProcessStartInfo
                 {
-                    FileName = "python3",
-                    Arguments = path,
+                    FileName = "/bin/bash",
+                    Arguments = $"-c \"{command}\"",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true
@@ -45,12 +45,12 @@ namespace GPT.API.AiFunctions
                 process.WaitForExit();
                 var output = process.StandardOutput.ReadToEnd();
                 var error = process.StandardError.ReadToEnd();
-                if (error != "")
-                    // Debug.LogError(error);
-                    Console.WriteLine(error);
-                else
-                    // Debug.Log(output);
-                    Console.WriteLine(output);
+                // if (error != "")
+                //     // Debug.LogError(error);
+                //     // Console.WriteLine(error);
+                // else
+                //     // Debug.Log(output);
+                    // Console.WriteLine(output);
                 return output;
             }
 
